@@ -33,10 +33,6 @@
 (= (get-parents $child)
     (match &self (is-parent $parent $child) $parent)
     )
-    ; (if (list $parents)
-    ;     $parents
-    ;     (list $parents)
-    ; )
 
 
 
@@ -101,37 +97,30 @@
         )
 )
 
-
-(= (empty? $list) (== (collapse $list) ()))
-
-(= (ancestor-helper $a $acc)
-    (if (empty? (get-parents $a))  ; Base case: stop if no parents
-        $acc
-        (let* (
-            ($p (get-parents $a))  ; Get parents
-            (() (println! (parent $p))) 
-            ($s (collapse $p)) ; Debugging: print parents
-            ($c (union $acc $s))  ; Add parents to accumulator
-            (() (println! (ccc $c)))  ; Debugging: print current accumulator
-        ) 
-        ; (ancestor-helper $p $c)  ; Recur for each parent
+! (bind! &ancestor (new-space))
+(= (ancestor $child)
+    (let* (
+        ($p (get-parents $child))
+        ($s (add-atom &ancestor $p))
         )
+        (ancestor $p)
     )
+
 )
 
-(= (ancestor $a) (ancestor-helper $a ()))  ; Initialize with empty accumulator
 
 
 
 
 
-; ! (get-parents John)
-; ! (is-mother John)
-; ! (is-child Monica)
-; ! (is-sibling John)
-; !(is-uncle Bob)
-; !(is-nephew Pam)
+! (get-parents (get-parents Bob))
+! (is-mother John)
+! (is-child Monica)
+! (is-sibling John)
+!(is-uncle Bob)
+!(is-nephew Pam)
 !(ancestor Bob)
+! (get-atoms &ancestor)
 
 
 
