@@ -43,10 +43,9 @@
 (= (is-mother $child)
     (let* 
     (
-        ($x (collapse (get-parents $child)))
-        (($p1 $p2) $x)
+        ($p (get-parents $child))
     )
-    (if (is-male $p1) $p2 $p1))
+    (if (is-male $p) (empty) $p))
 )
 
 
@@ -97,16 +96,25 @@
         )
 )
 
-! (bind! &ancestor (new-space))
-(= (ancestor $child)
-    (let* (
-        ($p (get-parents $child))
-        ($s (add-atom &ancestor $p))
-        )
-        (ancestor $p)
-    )
-
+(= (ancestor-helper $list)
+    (collapse $list)
 )
+
+(= (ancestor $child $acc)
+    (let*
+        (
+            ($a (collapse (get-parents $child)))
+            ($carry (union-atom $acc $a))
+            
+        ) 
+        (if (== $a ())
+            $carry
+            (ancestor (superpose $a) $carry)
+        )
+    )
+)
+
+            
 
 
 
@@ -114,13 +122,9 @@
 
 
 ! (get-parents (get-parents Bob))
-! (is-mother John)
+! (is-mother Bob)
 ! (is-child Monica)
 ! (is-sibling John)
 !(is-uncle Bob)
 !(is-nephew Pam)
-!(ancestor Bob)
-! (get-atoms &ancestor)
-
-
-
+! (let $n (collapse (ancestor Bob ())) (unique (superpose $n)))
