@@ -9,7 +9,7 @@
     (if (== $list ())
         0
         (+ 1 (length (cdr-atom $list))))    
-    )
+)
 
 
 
@@ -144,17 +144,41 @@
 
 ;; Sorting Algorithms
 
-; (: insert (-> Number List List))
-(= (insert $x ()) (:: $x ()))
-(= (insert $x (:: $y $ys))
-   (if (<= $x $y)
-       (:: $x (:: $y $ys))
-       (:: $y (insert $x $ys))))
+(= (quicksort $lst)
+   (if (== $lst ())
+       ()
+       (let* ((($pivot $rest) (decons-atom $lst)))
+         (let* (($lesser (filter-less $pivot $rest))
+                ($greater (filter-greater-eq $pivot $rest))
+                ($sorted-lesser (quicksort $lesser))
+                ($sorted-greater (quicksort $greater))
+                ($pivot-and-greater (cons-atom $pivot $sorted-greater)))
+           (concat $sorted-lesser $pivot-and-greater)))))
 
-; (: sort (-> List List))
-(= (sort ()) ())
-(= (sort (:: $x $xs))
-   (insert $x (sort $xs)))
+(= (filter-less $pivot $lst)
+   (if (== $lst ())
+       ()
+       (let* ((($head $tail) (decons-atom $lst)))
+         (if (< $head $pivot)
+             (let* (($filtered (filter-less $pivot $tail)))
+               (cons-atom $head $filtered))
+             (filter-less $pivot $tail)))))
+
+(= (filter-greater-eq $pivot $lst)
+   (if (== $lst ())
+       ()
+       (let* ((($head $tail) (decons-atom $lst)))
+         (if (>= $head $pivot)
+             (let* (($filtered (filter-greater-eq $pivot $tail)))
+               (cons-atom $head $filtered))
+             (filter-greater-eq $pivot $tail)))))
+
+(= (concat $a $b)
+   (if (== $a ())
+       $b
+       (let* ((($head $tail) (decons-atom $a)))
+         (let* (($concatenated (concat $tail $b)))
+           (cons-atom $head $concatenated)))))
 
 ;; =============== ;;
 ;; Example Usages ;;
@@ -176,5 +200,5 @@
 ! (filter less-than-3 (1 2 3 4 5))
 ! (filter greater-eq-5 (1 2 3 4 5 6))
 ! (foldr + 0 (1 2 3 4))
-! (sort (:: 30 (:: 13 (:: -4 (:: 12 ())))))
+! (quicksort (8 7 6 1 0 9 2))
 ! (remove-duplicates (1 2 2 3 1 4))
